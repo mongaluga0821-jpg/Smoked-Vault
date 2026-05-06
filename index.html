@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Smoked Vault – Arcade Simulation</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splash-screen" class="screen active">
+    <div class="splash-logo">
+      <div class="vault-icon">🔒</div>
+      <h1>SMOKED VAULT</h1>
+      <p class="subtitle">Arcade Simulation Suite</p>
+      <p class="owner">© 2025 Israel Lopez — Educational Use Only</p>
+    </div>
+    <button class="btn-primary" onclick="SV.enterVault()">ENTER VAULT</button>
+    <div class="splash-disclaimer">No real money · No gambling · Pure skill-based simulation</div>
+    <div class="splash-particles" id="splashParticles"></div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="main-menu" class="screen">
+    <div class="menu-header">
+      <h2>🔓 VAULT HQ</h2>
+      <div class="player-stats">
+        <span>⭐ Score: <b id="totalScore">0</b></span>
+        <span>🏆 Level: <b id="playerLevel">1</b></span>
+        <span>🎖 Badges: <b id="badgeCount">0</b></span>
+        <span id="xp-bar-wrap" title="XP to next level">
+          <span class="xp-label">XP</span>
+          <span class="xp-track"><span class="xp-fill" id="xpFill"></span></span>
+        </span>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <button class="menu-btn vault-btn" onclick="showScreen('vault-map')">🗺 VAULT ROOMS</button>
+      <button class="menu-btn"           onclick="showScreen('daily-challenge')">🔥 DAILY CHALLENGE</button>
+      <button class="menu-btn"           onclick="showScreen('leaderboard')">🏆 LEADERBOARD</button>
+      <button class="menu-btn"           onclick="showScreen('achievements')">🎖 ACHIEVEMENTS</button>
+      <button class="menu-btn"           onclick="showScreen('shop')">🎨 COSMETICS</button>
+      <button class="menu-btn"           onclick="showScreen('tournament')">⚔ TOURNAMENT</button>
+      <button class="menu-btn"           onclick="showScreen('fish-codex')">📖 FISH CODEX</button>
+    </div>
+    <div class="version-tag">Smoked Vault v3.0 · Educational Simulation · No Real Money</div>
+  </div>
+
+  <!-- VAULT MAP -->
+  <div id="vault-map" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>🗺 VAULT ROOMS</h2>
+    </div>
+    <div class="vault-rooms" id="vaultRooms"></div>
+  </div>
+
+  <!-- TARGET PRACTICE -->
+  <div id="target-practice" class="screen">
+    <div class="game-topbar">
+      <button class="back-btn" onclick="exitGame('vault-map')">✕</button>
+      <span>🎯 TARGET PRACTICE</span>
+      <span>⏱ <b id="tp-timer">30</b>s</span>
+      <span>Score: <b id="tp-score">0</b></span>
+      <span>Best: <b id="tp-best">0</b></span>
+      <span>🔥 Streak: <b id="tp-streak">0</b></span>
+    </div>
+    <div id="tp-diff-select" class="diff-select">
+      <h3>Select Difficulty</h3>
+      <button class="btn-diff" onclick="startTargetPractice(1)">⚡ ROOKIE<br><small>3 targets · Large</small></button>
+      <button class="btn-diff" onclick="startTargetPractice(2)">🔥 SKILLED<br><small>5 targets · Medium</small></button>
+      <button class="btn-diff" onclick="startTargetPractice(3)">💀 MASTER<br><small>7 targets · Small & fast</small></button>
+    </div>
+    <canvas id="tp-canvas" class="game-canvas" style="display:none"></canvas>
+    <div id="tp-result" class="result-panel" style="display:none"></div>
+  </div>
+
+  <!-- PUZZLE BOARDS -->
+  <div id="puzzle-boards" class="screen">
+    <div class="game-topbar">
+      <button class="back-btn" onclick="exitGame('vault-map')">✕</button>
+      <span>🧩 PUZZLE BOARDS</span>
+      <span>⏱ <b id="pb-timer">0</b>s</span>
+      <span>Moves: <b id="pb-moves">0</b></span>
+      <span>Best: <b id="pb-best">--</b></span>
+    </div>
+    <div id="pb-diff-select" class="diff-select">
+      <h3>Select Layout</h3>
+      <button class="btn-diff" onclick="startPuzzle('3x3')">🟦 3×3<br><small>Beginner</small></button>
+      <button class="btn-diff" onclick="startPuzzle('4x4')">🟪 4×4<br><small>Intermediate</small></button>
+      <button class="btn-diff" onclick="startPuzzle('5x5')">🟥 5×5<br><small>Expert</small></button>
+    </div>
+    <div id="pb-game" style="display:none">
+      <div id="puzzle-grid" class="puzzle-grid"></div>
+      <div class="puzzle-controls">
+        <button class="btn-secondary" onclick="shufflePuzzle()">🔀 SHUFFLE</button>
+        <button class="btn-secondary" onclick="solvePuzzleHint()">💡 HINT</button>
+      </div>
+    </div>
+    <div id="pb-result" class="result-panel" style="display:none"></div>
+  </div>
+
+  <!-- MAZE RUNNER -->
+  <div id="maze-runner" class="screen">
+    <div class="game-topbar">
+      <button class="back-btn" onclick="exitGame('vault-map')">✕</button>
+      <span>🌀 MAZE RUNNER</span>
+      <span>⏱ <b id="mz-timer">0</b>s</span>
+      <span>Level: <b id="mz-level">1</b></span>
+      <span>Best: <b id="mz-best">--</b>s</span>
+    </div>
+    <div id="mz-diff-select" class="diff-select">
+      <h3>Select Maze Size</h3>
+      <button class="btn-diff" onclick="startMaze(11)">🟩 SMALL<br><small>11×11</small></button>
+      <button class="btn-diff" onclick="startMaze(15)">🟨 MEDIUM<br><small>15×15</small></button>
+      <button class="btn-diff" onclick="startMaze(21)">🟧 LARGE<br><small>21×21</small></button>
+    </div>
+    <canvas id="mz-canvas" class="game-canvas" style="display:none"></canvas>
+    <div id="mz-controls" class="maze-controls" style="display:none">
+      <button onclick="moveMaze('up')"    aria-label="Up">⬆</button>
+      <div>
+        <button onclick="moveMaze('left')"  aria-label="Left">⬅</button>
+        <button onclick="moveMaze('down')"  aria-label="Down">⬇</button>
+        <button onclick="moveMaze('right')" aria-label="Right">➡</button>
+      </div>
+    </div>
+    <div id="mz-result" class="result-panel" style="display:none"></div>
+  </div>
+
+  <!-- TRIVIA VAULT -->
+  <div id="trivia-vault" class="screen">
+    <div class="game-topbar">
+      <button class="back-btn" onclick="exitGame('vault-map')">✕</button>
+      <span>🧠 TRIVIA VAULT</span>
+      <span>⏱ <b id="tv-timer">15</b>s</span>
+      <span>Score: <b id="tv-score">0</b></span>
+      <span>Q: <b id="tv-q">0</b>/10</span>
+    </div>
+    <div id="tv-diff-select" class="diff-select">
+      <h3>Select Category</h3>
+      <button class="btn-diff" onclick="startTrivia('math')">➕ MATH<br><small>Arithmetic & Algebra</small></button>
+      <button class="btn-diff" onclick="startTrivia('science')">🔬 SCIENCE<br><small>Physics & Biology</small></button>
+      <button class="btn-diff" onclick="startTrivia('logic')">🧩 LOGIC<br><small>Patterns & Reasoning</small></button>
+    </div>
+    <div id="tv-game" style="display:none">
+      <div class="trivia-header">
+        <div class="tv-progress-bar"><div class="tv-progress-fill" id="tv-progress-fill"></div></div>
+      </div>
+      <div class="trivia-question" id="tv-question-text"></div>
+      <div id="tv-options" class="trivia-options"></div>
+      <div id="tv-feedback" class="trivia-feedback"></div>
+    </div>
+    <div id="tv-result" class="result-panel" style="display:none"></div>
+  </div>
+
+  <!-- ═══ OCEAN KING v4 – FISH TABLE ═══ -->
+  <div id="fish-table" class="screen fish-screen">
+    <div class="game-topbar fish-topbar">
+      <button class="back-btn" onclick="exitGame('vault-map')">✕</button>
+      <span>🐟 OCEAN KING v4</span>
+      <span>⏱ <b id="ft-timer">70</b>s</span>
+      <span>Score: <b id="ft-score">0</b></span>
+      <span>Ammo: <b id="ft-ammo">35</b></span>
+      <span>Combo: <b id="ft-combo">×1</b></span>
+      <span id="ft-weapon-label" class="ft-weapon-label">🔫 Pistol Lv1</span>
+      <span id="ft-power-icons" class="ft-power-icons"></span>
+    </div>
+    <div id="ft-hud" class="ft-hud" style="display:none">
+      <div class="ft-hud-tip">
+        🖱 Click/Tap to shoot &nbsp;|&nbsp; Hold <kbd>SPACE</kbd> = Torpedo 🚀 &nbsp;|&nbsp;
+        Keys <kbd>1</kbd>–<kbd>5</kbd> = Switch weapon
+      </div>
+    </div>
+    <!-- LOBBY: Mode + Weapon selector -->
+    <div id="ft-diff-select" class="diff-select ft-lobby">
+      <h3>🌊 OCEAN KING v4 — SELECT MODE</h3>
+      <div class="ft-diff-grid">
+        <button class="btn-diff" onclick="FT._selMode('standard')">
+          🟢 STANDARD<br><small>35 ammo · 70s · Classic pace</small>
+        </button>
+        <button class="btn-diff" onclick="FT._selMode('powershot')">
+          🟡 POWER SHOT<br><small>28 ammo · 60s · Fast fish</small>
+        </button>
+        <button class="btn-diff" onclick="FT._selMode('blaster')">
+          🔴 BLASTER<br><small>22 ammo · 50s · Bosses appear</small>
+        </button>
+        <button class="btn-diff ft-boss-btn" onclick="FT._selMode('bossrush')">
+          💀 BOSS RUSH<br><small>40 ammo · 90s · Bosses only!</small>
+        </button>
+        <button class="btn-diff ft-frenzy-btn" onclick="FT._selMode('frenzy')">
+          ⚡ SPEED FRENZY<br><small>50 ammo · 30s · 5× speed!</small>
+        </button>
+      </div>
+
+      <!-- Weapon Selector -->
+      <div class="ft-weapon-selector">
+        <div class="ft-ws-title">🔫 SELECT WEAPON</div>
+        <div class="ft-ws-grid" id="ft-ws-grid"></div>
+      </div>
+
+      <!-- How-to quick reference -->
+      <div class="ft-howto">
+        <div class="howto-item">🐟 Common = 2–4 pts</div>
+        <div class="howto-item">🦈 Rare = 6–9 pts</div>
+        <div class="howto-item">🐙 Epic = 12–18 pts</div>
+        <div class="howto-item">🐳 Boss = 50–80 pts</div>
+        <div class="howto-item">⭐ Mystery = 25–35 pts</div>
+        <div class="howto-item">🐲 Sea Dragon (seasonal!)</div>
+        <div class="howto-item">✕ Red dot = weak point!</div>
+        <div class="howto-item">📦 Loot Chest = random reward</div>
+        <div class="howto-item">🛡 Shield = absorb 1 miss</div>
+        <div class="howto-item">⚡ Phase 2+ = boss speeds up</div>
+      </div>
+    </div>
+    <canvas id="ft-canvas" class="game-canvas" style="display:none"></canvas>
+    <div id="ft-result" class="result-panel" style="display:none"></div>
+  </div>
+
+  <!-- FISH CODEX (collection catalogue) -->
+  <div id="fish-codex" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>📖 FISH CODEX</h2>
+    </div>
+    <p class="ach-count" id="codex-progress"></p>
+    <div id="codex-grid" class="codex-grid"></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div id="leaderboard" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>🏆 LEADERBOARD</h2>
+    </div>
+    <div class="lb-tabs" id="lb-tabs">
+      <button class="lb-tab active" data-type="target">🎯 Target</button>
+      <button class="lb-tab"        data-type="puzzle">🧩 Puzzle</button>
+      <button class="lb-tab"        data-type="maze">🌀 Maze</button>
+      <button class="lb-tab"        data-type="trivia">🧠 Trivia</button>
+      <button class="lb-tab"        data-type="fish">🐟 Fish</button>
+    </div>
+    <div id="lb-list" class="lb-list"></div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div id="achievements" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>🎖 ACHIEVEMENTS</h2>
+    </div>
+    <p class="ach-count" id="ach-count-label"></p>
+    <div id="achievements-grid" class="achievements-grid"></div>
+  </div>
+
+  <!-- COSMETICS SHOP -->
+  <div id="shop" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>🎨 COSMETICS</h2>
+    </div>
+    <p class="shop-note">All unlocked via achievements — zero purchases, zero randomness.</p>
+    <div id="cosmetics-grid" class="cosmetics-grid"></div>
+  </div>
+
+  <!-- TOURNAMENT -->
+  <div id="tournament" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>⚔ WEEKLY TOURNAMENT</h2>
+    </div>
+    <div class="tournament-info">
+      <div class="tourney-card">
+        <h3>🎯 Speed Shooter</h3>
+        <p>Best Target Practice score this week</p>
+        <div class="tourney-rank">Your rank: <b>#--</b></div>
+        <button class="btn-primary" onclick="showScreen('target-practice')">COMPETE NOW</button>
+      </div>
+      <div class="tourney-card">
+        <h3>🧩 Puzzle Master</h3>
+        <p>Fastest puzzle completion this week</p>
+        <div class="tourney-rank">Your rank: <b>#--</b></div>
+        <button class="btn-primary" onclick="showScreen('puzzle-boards')">COMPETE NOW</button>
+      </div>
+      <div class="tourney-card">
+        <h3>🌀 Maze Sprint</h3>
+        <p>Fastest maze run this week</p>
+        <div class="tourney-rank">Your rank: <b>#--</b></div>
+        <button class="btn-primary" onclick="showScreen('maze-runner')">COMPETE NOW</button>
+      </div>
+      <div class="tourney-card">
+        <h3>🐟 Ocean King</h3>
+        <p>Highest Fish Table score this week</p>
+        <div class="tourney-rank">Your rank: <b>#--</b></div>
+        <button class="btn-primary" onclick="showScreen('fish-table')">COMPETE NOW</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY CHALLENGE -->
+  <div id="daily-challenge" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="showScreen('main-menu')">← BACK</button>
+      <h2>🔥 DAILY CHALLENGE</h2>
+    </div>
+    <div id="daily-content" class="daily-content"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/game.js"></script>
+  <script src="js/target.js"></script>
+  <script src="js/puzzle.js"></script>
+  <script src="js/maze.js"></script>
+  <script src="js/trivia.js"></script>
+  <script src="js/fish.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
